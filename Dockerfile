@@ -10,8 +10,9 @@ ADD https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/am
 ADD https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator /usr/bin/aws-iam-authenticator
 RUN chmod +x /usr/bin/kubectl /usr/bin/aws-iam-authenticator
 
-# Install the Drone plugin script
+# Install the Drone plugin scripts
 COPY update.sh /bin/
+COPY connect-eks.sh /bin/
 
 ENTRYPOINT ["/bin/bash"]
 CMD ["/bin/update.sh"]
