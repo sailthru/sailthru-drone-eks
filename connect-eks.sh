@@ -1,8 +1,44 @@
 #!/bin/bash
 
+set -x
+
+# Vars definition
+ci_role=${PLUGIN_USE_CI_ROLE:-'ci'}
+session_id="${DRONE_COMMIT_SHA:0:10}-${DRONE_BUILD_NUMBER}"
+account_id=${PLUGIN_ACCOUNT:-'none'}
+aws_credentials_ttl=${PLUGIN_AWS_CREDENTIALS_TTL:-'3600'}
+aws_region=${PLUGIN_AWS_REGION:-'eu-west-1'}
+on_error=${PLUGIN_ON_ERROR:-'cleanup'}
+
+# Manage mult-account
+#
+if [ "${account_id}" == "none" ]; then
+  account_id="IAM Role"
+fi
+
+# Print authentication infos
+echo "AWS credentials meta:"
+echo "  CI Role: ${ci_role}"
+echo "  Account ID: ${account_id}"
+echo "  IAM Role Session ID: ${session_id}"
+echo "  IAM Credentials TTL: ${aws_credentials_ttl}"
+
+# Get authentified if a role is specified
+if [ "${account_id}" != "IAM Role" ]; then
+  iam_creds=$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/${ci_role}" --role-session-name "drone-${session_id}" --duration-seconds ${aws_credentials_ttl} --region ${aws_region} | python -m json.tool)
+
+  if [ -z "${iam_creds}" ]; then
+    echo "ERROR: Unable to assume AWS role"
+    exit 1
+  fi
+
+  export AWS_ACCESS_KEY_ID=$(echo "${iam_creds}" | grep AccessKeyId | tr -d '" ,' | cut -d ':' -f2)
+  export AWS_SECRET_ACCESS_KEY=$(echo "${iam_creds}" | grep SecretAccessKey | tr -d '" ,' | cut -d ':' -f2)
+  export AWS_SESSION_TOKEN=$(echo "${iam_creds}" | grep SessionToken | tr -d '" ,' | cut -d ':' -f2)
+fi
+
 # Establish an authenticated connection to an EKS cluster.
 #
-
 if [ -z ${PLUGIN_EKS_CLUSTER} ]; then
   echo "EKS_CLUSTER (Name of EKS cluster) must be defined."
   exit 1
