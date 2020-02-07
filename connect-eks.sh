@@ -79,5 +79,3 @@ users:
         - -r
         - ${PLUGIN_IAM_ROLE_ARN}
 EOF
-
-kubectl version
