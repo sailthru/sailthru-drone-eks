@@ -1,7 +1,7 @@
-FROM alpine:3.8
+FROM python:3.7-alpine
 
 # Install base utilities
-RUN apk --no-cache add curl ca-certificates bash jq groff less python py-pip py-setuptools
+RUN apk --no-cache add curl ca-certificates bash jq groff less
 RUN pip --no-cache-dir install awscli
 
 # Download the Amazon blessed utilities as per:
