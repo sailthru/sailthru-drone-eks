@@ -2,7 +2,7 @@ FROM python:3.8-alpine
 
 # Install base utilities
 RUN apk --no-cache add curl ca-certificates bash jq groff less
-RUN pip --no-cache-dir install awscli
+RUN pip --no-cache-dir install awscli deepmerge
 
 # Download the Amazon blessed utilities as per:
 # https://docs.aws.amazon.com/eks/latest/userguide/configure-kubectl.html
