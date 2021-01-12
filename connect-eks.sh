@@ -34,6 +34,11 @@ if [ -z $KUBERNETES_TOKEN ]; then
   exit 1
 fi
 
+# Assume the deployer role and set AWS creds to get further cluster information
+aws sts assume-role --role-arn $PLUGIN_IAM_ROLE_ARN --role-session-name "drone" > assume-role-output.json
+export AWS_ACCESS_KEY_ID=$(cat assume-role-output.json | jq -r .Credentials.AccessKeyId)
+export AWS_SECRET_ACCESS_KEY=$(cat assume-role-output.json | jq -r .Credentials.SecretAccessKey)
+export AWS_SESSION_TOKEN=$(cat assume-role-output.json | jq -r .Credentials.SessionToken)
 
 # Fetch the EKS cluster information.
 EKS_URL=$(aws eks describe-cluster --name ${PLUGIN_EKS_CLUSTER} | jq -r .cluster.endpoint)
