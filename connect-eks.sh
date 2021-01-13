@@ -49,6 +49,10 @@ if [ -z $EKS_URL ] || [ -z $EKS_CA ]; then
   exit 1
 fi
 
+# restore environment by removing static keys
+unset AWS_ACCESS_KEY_ID
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_SESSION_TOKEN
 
 # Generate configuration files
 mkdir ~/.kube
