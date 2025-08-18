@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3.14.0rc2-alpine
 
 # Install base utilities
 RUN apk --no-cache add curl ca-certificates bash jq groff less
